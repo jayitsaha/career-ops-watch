@@ -77,6 +77,8 @@ function runScan() {
         "1",
         "--limit",
         String(PER_LEG_LIMIT),
+        "--shuffle", // without this, --limit always takes the SAME alphabetical-first
+                      // slice every run forever, permanently missing everything after it
       ],
       { cwd: SRC_DIR }
     );
