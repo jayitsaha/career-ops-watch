@@ -24,16 +24,17 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const USER_PROFILE = `Incoming Georgia Tech MS in Computer Science student, specializing in Machine
-Learning. Wants ONLY Summer 2027 internships, USA-based, in exactly these
-tracks: (1) Data Scientist / Applied Data Scientist / Research Data Scientist,
+Learning. Wants ONLY Summer 2027 internships, USA-based, in these tracks:
+(1) Data Scientist / Applied Data Scientist / Research Data Scientist,
 (2) Software Engineer / SWE (including close variants: ML Engineer, Platform
-Engineer intern roles), (3) Quantitative Research (quant research intern/
-researcher — NOT quant trading, NOT quant trader, NOT quant analyst). Drop
-anything that isn't a Summer 2027 US internship in one of these three tracks —
-general Applied Scientist/Research Scientist (non-DS), GenAI/LLM/Agentic
-roles, quant trading/analyst roles, non-US postings, and full-time-only roles
-are all OUT OF SCOPE and should be omitted entirely, even if they were flagged
-as a raw match. These postings come from an automated ATS scan (career-ops).`;
+Engineer intern roles), (3) Applied Scientist / Research Scientist / GenAI /
+LLM / Agentic / RAG / Generative AI roles, (4) Quantitative Research (quant
+research intern/researcher) AND Quantitative Trading (quant trader,
+quantitative analyst, quant developer). Consider multiple phrasings/synonyms
+per track when judging relevance, not just exact title matches. Drop postings
+outside all four tracks, non-US postings, and full-time-only roles — omit
+those entirely even if they were flagged as a raw match. These postings come
+from an automated ATS scan (career-ops).`;
 
 // Hard gate: most raw ATS postings carry no structured "year" field, so the
 // title/company text itself must mention 2027 (case-insensitive) or this

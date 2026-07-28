@@ -1,12 +1,9 @@
 # Portal Scanner Configuration — Jayit Saha
 # Copied/customized from templates/portals.example.yml.
-# Targets (narrowed 2026-07-29 per explicit request): Data Science / Applied DS /
-# Research Data Scientist, Software Engineering / SWE, and Quant Research
-# internships for Summer 2027, US-based only. General Applied/Research
-# Scientist, GenAI/LLM/Agentic, and quant-trading roles are intentionally
-# EXCLUDED now — this list is deliberately narrower than career-ops's own
-# config/profile.yml (the interactive CV-tailoring tool still targets the
-# broader set of tracks; this file only controls what triggers a notification).
+# Targets (updated 2026-07-29): Data Science / Applied DS / Research Data
+# Scientist, Software Engineering / SWE, Applied/Research Scientist,
+# GenAI/LLM/Agentic, Quant Research, and quant-trading roles — Summer 2027
+# internships, US-based only.
 #
 # NOTE on tracked_companies below: careers_url values are the correct BRANDED
 # career pages per company. Provider auto-detection (Greenhouse/Lever/Ashby/
@@ -23,6 +20,18 @@
 
 title_filter:
   positive:
+    # -- Applied / Research Scientist / GenAI / LLM / Agentic --
+    - "Applied Scientist"
+    - "Research Scientist"
+    - "Applied AI"
+    - "Machine Learning Scientist"
+    - "AI Research"
+    - "LLM"
+    - "NLP"
+    - "Agentic"
+    - "RAG"
+    - "GenAI"
+    - "Generative AI"
     # -- Data Scientist / Applied DS / Research Data Scientist --
     - "Data Scientist Intern"
     - "Data Science Intern"
@@ -36,13 +45,17 @@ title_filter:
     - "Platform Engineer Intern"
     - "ML Infrastructure Intern"
     - "ML Platform Intern"
-    # -- Quant Research (+ close variants) --
+    # -- Quant Research + Quant Trading (+ close variants) --
     - "Quantitative Research Intern"
     - "Quant Research Intern"
     - "Quantitative Researcher"
     - "Quant Researcher"
     - "Quantitative Developer Intern"
     - "Quant Developer Intern"
+    - "Quantitative Developer"
+    - "Quant Trader"
+    - "Quantitative Analyst"
+    - "Quantitative Trading"
   negative:
     - ".NET"
     - "PHP"
@@ -52,14 +65,12 @@ title_filter:
     - "ASIC"
     - "Blockchain"
     - "Web3"
-    - "Crypto Trading"
+    - "Crypto Trading"  # avoid crypto-native shops; keep "Crypto" out to not exclude quant-crypto roles broadly
     - "Salesforce Admin"
     - "SAP "
     - "Mainframe"
     - "COBOL"
     - "Full-time"  # this account targets internships; drop obvious FTE-only postings when the title says so explicitly
-    - "Quant Trader"  # trading, not research — out of scope per explicit request
-    - "Quantitative Analyst"  # trading-desk analyst, not research — out of scope
   seniority_boost:
     - "Intern"
     - "Summer 2027"
@@ -186,14 +197,38 @@ tracked_companies:
     enabled: true
 
 # -- Search queries --
-# Broad discovery fallback for postings outside tracked_companies.
+# Broad discovery fallback for postings outside tracked_companies. Multiple
+# overlapping phrasings per track (and a couple of cross-track combos) so a
+# posting that only matches one wording still gets caught.
 search_queries:
+  # -- SWE --
   - name: SWE Intern — Summer 2027
     query: '"Software Engineer Intern" OR "Machine Learning Engineer Intern" "Summer 2027"'
     enabled: true
+  - name: Platform/Infra Engineer Intern — Summer 2027
+    query: '"Platform Engineer Intern" OR "ML Infrastructure Intern" OR "ML Platform Intern" "Summer 2027"'
+    enabled: true
+  # -- Data Scientist / Applied DS / Research Data Scientist --
+  - name: Data Scientist / Applied DS / Research Data Scientist Intern — Summer 2027
+    query: '"Data Scientist Intern" OR "Applied Data Scientist" OR "Research Data Scientist" "Summer 2027" visa sponsorship'
+    enabled: true
+  # -- Applied / Research Scientist / GenAI / LLM / Agentic --
+  - name: Applied/Research Scientist — visa sponsorship
+    query: '"Applied Scientist" OR "Research Scientist" intern 2027 "visa sponsorship"'
+    enabled: true
+  - name: GenAI/LLM/Agentic Intern — Summer 2027
+    query: '"GenAI" OR "Generative AI" OR "LLM" OR "Agentic" intern "Summer 2027"'
+    enabled: true
+  - name: Applied AI / ML Scientist Intern — Summer 2027
+    query: '"Applied AI" OR "Machine Learning Scientist" intern "Summer 2027"'
+    enabled: true
+  # -- Quant Research + Quant Trading --
   - name: Quant Research Intern — Summer 2027
     query: '"Quantitative Research Intern" OR "Quant Research Intern" "Summer 2027"'
     enabled: true
-  - name: Data Scientist / Applied DS / Research Data Scientist Intern — Summer 2027
-    query: '"Data Scientist Intern" OR "Applied Data Scientist" OR "Research Data Scientist" "Summer 2027" visa sponsorship'
+  - name: Quant Trading/Trader Intern — Summer 2027
+    query: '"Quant Trader" OR "Quantitative Trading" OR "Quantitative Analyst" intern "Summer 2027"'
+    enabled: true
+  - name: Quant Developer Intern — Summer 2027
+    query: '"Quantitative Developer" OR "Quant Developer Intern" "Summer 2027"'
     enabled: true
