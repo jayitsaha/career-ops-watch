@@ -113,7 +113,7 @@ function runScans() {
     results.scan = "failed";
   }
   try {
-    sh("node", ["scan-ats-full.mjs", "--since", "1", "--limit", "300"], {
+    sh("node", ["scan-ats-full.mjs", "--since", "1", "--limit", "1500"], {
       cwd: SRC_DIR,
     });
     results.scanFull = "ok";
