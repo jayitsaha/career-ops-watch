@@ -1,0 +1,201 @@
+# Portal Scanner Configuration — Jayit Saha
+# Copied/customized from templates/portals.example.yml.
+# Targets: Applied/Research Scientist, ML/SWE, Data Scientist, Quant-Dev
+# internships (Summer 2027), US-based.
+#
+# NOTE on tracked_companies below: careers_url values are the correct BRANDED
+# career pages per company. Provider auto-detection (Greenhouse/Lever/Ashby/
+# Workday/etc.) works out of the box for some of these; several big-cap
+# companies (Google, Meta, Apple, Netflix, Jane Street, etc.) run custom
+# in-house career boards with no public ATS API, so scan.mjs will fall back
+# to the WebSearch strategy (level 3) for those rather than the zero-token
+# API path (level 2) — that's expected, not a misconfiguration. Run
+# `node validate-portals.mjs` after editing to sanity-check this file.
+
+title_filter:
+  positive:
+    # -- Applied / Research Scientist --
+    - "Applied Scientist"
+    - "Research Scientist"
+    - "Applied AI"
+    - "Machine Learning Scientist"
+    - "Machine Learning Engineer"
+    - "AI Research"
+    - "LLM"
+    - "NLP"
+    - "Agentic"
+    - "RAG"
+    - "GenAI"
+    - "Generative AI"
+    # -- ML / Software Engineer --
+    - "Software Engineer Intern"
+    - "ML Engineer Intern"
+    - "SWE Intern"
+    - "Platform Engineer"
+    - "ML Infrastructure"
+    - "ML Platform"
+    # -- Data Scientist --
+    - "Data Scientist Intern"
+    - "Data Science Intern"
+    - "Applied Data Scientist"
+    # -- Quant --
+    - "Quantitative Developer"
+    - "Quantitative Researcher"
+    - "Quant Developer"
+    - "Quant Trader"
+    - "Quantitative Research Intern"
+    - "Quantitative Analyst"
+  negative:
+    - ".NET"
+    - "PHP"
+    - "Embedded"
+    - "Firmware"
+    - "FPGA"
+    - "ASIC"
+    - "Blockchain"
+    - "Web3"
+    - "Crypto Trading"  # avoid crypto-native shops; keep "Crypto" out to not exclude quant-crypto roles broadly
+    - "Salesforce Admin"
+    - "SAP "
+    - "Mainframe"
+    - "COBOL"
+    - "Full-time"  # this account targets internships; drop obvious FTE-only postings when the title says so explicitly
+  seniority_boost:
+    - "Intern"
+    - "Summer 2027"
+    - "PhD"
+    - "MS"
+
+# -- Location filter --
+# US-based only: F-1/CPT requires a US work location (see modes/_profile.md).
+location_filter:
+  always_allow:
+    - "United States"
+    - "Atlanta"
+  allow:
+    - "Remote"
+    - "United States"
+    - "USA"
+    - "US"
+    - "Atlanta"
+    - "New York"
+    - "San Francisco"
+    - "Seattle"
+    - "Chicago"
+    - "Austin"
+    - "Boston"
+  block:
+    - "India"
+    - "Bengaluru"
+    - "United Kingdom"
+    - "London"
+    - "Germany"
+    - "Singapore"
+    - "China"
+    - "Canada"  # visa path is US-specific (F-1/CPT); drop non-US postings
+
+# -- Visa filter --
+# Surface roles that mention sponsorship; don't hard-drop roles that are silent
+# (per modes/_profile.md: silence on sponsorship should score neutral, not be
+# treated as a blocker). Only an explicit "no sponsorship" should reject.
+visa_filter:
+  enabled: true
+  require_mention: false
+
+# -- Trust filter --
+trust_filter:
+  enabled: true
+
+# ── Target companies ────────────────────────────────────────────────────────
+tracked_companies:
+  # -- Big tech / applied AI --
+  - name: NVIDIA
+    careers_url: https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite
+    enabled: true
+  - name: Google
+    careers_url: https://www.google.com/about/careers/applications/
+    enabled: true
+  - name: Meta
+    careers_url: https://www.metacareers.com/jobs
+    enabled: true
+  - name: Amazon
+    careers_url: https://www.amazon.jobs
+    provider: amazon
+    enabled: true
+  - name: Microsoft
+    careers_url: https://careers.microsoft.com
+    enabled: true
+  - name: Apple
+    careers_url: https://jobs.apple.com
+    enabled: true
+  - name: Netflix
+    careers_url: https://jobs.netflix.com
+    enabled: true
+  - name: Palantir
+    careers_url: https://www.palantir.com/careers/
+    enabled: true
+  - name: Adobe
+    careers_url: https://careers.adobe.com
+    enabled: true
+  - name: Datadog
+    careers_url: https://careers.datadoghq.com
+    enabled: true
+
+  # -- Quant / trading (Summer 2027 quant-dev / ML-quant targets) --
+  - name: Jane Street
+    careers_url: https://www.janestreet.com/join-jane-street/
+    enabled: true
+  - name: Two Sigma
+    careers_url: https://www.twosigma.com/careers/
+    enabled: true
+  - name: Citadel / Citadel Securities
+    careers_url: https://www.citadel.com/careers/
+    enabled: true
+  - name: Jump Trading
+    careers_url: https://www.jumptrading.com/careers/
+    enabled: true
+  - name: DRW
+    careers_url: https://drw.com/careers
+    enabled: true
+  - name: Hudson River Trading
+    careers_url: https://www.hudsonrivertrading.com/careers/
+    enabled: true
+  - name: Optiver
+    careers_url: https://optiver.com/working-at-optiver/career-opportunities/
+    enabled: true
+  - name: IMC Trading
+    careers_url: https://careers.imc.com
+    enabled: true
+  - name: Susquehanna International Group (SIG)
+    careers_url: https://careers.sig.com
+    enabled: true
+  - name: Point72
+    careers_url: https://www.point72.com/careers/
+    enabled: true
+
+  # -- AI-forward startups (Ashby/Greenhouse-friendly, common intern pipelines) --
+  - name: OpenAI
+    careers_url: https://openai.com/careers/
+    enabled: true
+  - name: Anthropic
+    careers_url: https://www.anthropic.com/careers
+    enabled: true
+  - name: Scale AI
+    careers_url: https://scale.com/careers
+    enabled: true
+
+# -- Search queries --
+# Broad discovery fallback for postings outside tracked_companies.
+search_queries:
+  - name: Applied/Research Scientist — visa sponsorship
+    query: '"Applied Scientist" OR "Research Scientist" intern 2027 "visa sponsorship"'
+    enabled: true
+  - name: ML/SWE Intern — Summer 2027
+    query: '"Software Engineer Intern" OR "Machine Learning Engineer Intern" "Summer 2027"'
+    enabled: true
+  - name: Quant Developer Intern — Summer 2027
+    query: '"Quantitative Developer Intern" OR "Quant Developer Intern" "Summer 2027"'
+    enabled: true
+  - name: Data Scientist Intern — Summer 2027
+    query: '"Data Scientist Intern" "Summer 2027" visa sponsorship'
+    enabled: true
