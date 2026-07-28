@@ -133,9 +133,15 @@ function parsePendingOffers() {
   return lines.map((line) => {
     const body = line.slice("- [ ] ".length);
     const parts = body.split(" | ").map((p) => p.trim());
-    // scan.mjs / scan-ats-full.mjs both write: URL | Company | Title | Location
-    const [url, company, title, location] = parts;
-    return { url, company, title, location: location || "N/A" };
+    // scan.mjs / scan-ats-full.mjs both write: URL | Company | Title | [Location | Compensation]
+    const [url, company, title, location, compensation] = parts;
+    return {
+      url,
+      company,
+      title,
+      location: location || "N/A",
+      compensation: compensation || null,
+    };
   });
 }
 
@@ -143,7 +149,9 @@ async function summarizeWithNim(items) {
   const listText = items
     .map(
       (i, idx) =>
-        `${idx + 1}. ${i.company} — ${i.title} (${i.location}) — ${i.url}`
+        `${idx + 1}. ${i.company} — ${i.title} (${i.location})${
+          i.compensation ? ` — comp: ${i.compensation}` : ""
+        } — ${i.url}`
     )
     .join("\n");
 
@@ -152,13 +160,19 @@ async function summarizeWithNim(items) {
     messages: [
       {
         role: "system",
-        content: `You write short, high-signal job-alert reports for a job seeker. ${USER_PROFILE}
-For each new posting given, judge relevance to the seeker's target roles. Output plain text
-(no markdown headers) formatted for a Telegram message:
-- Start with a one-line count summary.
-- List the most relevant roles first, each as: "Company — Title (Location)\\nApply: URL\\nWhy: <one short clause>".
-- If a posting is clearly irrelevant to the target roles, omit it entirely.
-- Keep the whole message under 3500 characters.`,
+        content: `You write short, high-signal, ACTIONABLE job-alert reports for a job seeker. ${USER_PROFILE}
+For each new posting given, judge relevance and assign a tier: 🔥 High or 🟡 Medium.
+Output plain text (no markdown headers) formatted for a Telegram message:
+- Start with a one-line count summary (e.g. "4 relevant of 20 new postings").
+- Group by tier, 🔥 High first, then 🟡 Medium. Within a tier, sort most relevant first.
+- Each item as exactly 4-5 lines, no blank line between items in the same tier:
+  "N. Company — Title (Location)
+  Apply: URL
+  Comp: <range if given, else omit this line entirely>
+  Why: <one short clause on fit>
+  Action: <one concrete next step — e.g. "Apply directly, strong match" or "Ask Claude to run career-ops's prepare-application on this link to tailor your CV first">"
+- If a posting is clearly irrelevant to the target roles, omit it entirely — do not list it even in a low tier.
+- Keep the whole message under 3800 characters. If trimming is needed, drop lowest-tier items first, never the count summary.`,
       },
       { role: "user", content: listText },
     ],
