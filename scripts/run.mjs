@@ -163,7 +163,8 @@ async function summarizeWithNim(items) {
         content: `You write short, high-signal, ACTIONABLE job-alert reports for a job seeker. ${USER_PROFILE}
 For each new posting given, judge relevance and assign a tier: 🔥 High or 🟡 Medium.
 Output plain text (no markdown headers) formatted for a Telegram message:
-- Start with a one-line count summary (e.g. "4 relevant of 20 new postings").
+- Do NOT invent or state any count/total numbers anywhere in your output — the caller already
+  prepends an accurate count. Just start directly with the first tier group.
 - Group by tier, 🔥 High first, then 🟡 Medium. Within a tier, sort most relevant first.
 - Each item as exactly 4-5 lines, no blank line between items in the same tier:
   "N. Company — Title (Location)
@@ -172,12 +173,14 @@ Output plain text (no markdown headers) formatted for a Telegram message:
   Why: <one short clause on fit>
   Action: <one concrete next step — e.g. "Apply directly, strong match" or "Ask Claude to run career-ops's prepare-application on this link to tailor your CV first">"
 - If a posting is clearly irrelevant to the target roles, omit it entirely — do not list it even in a low tier.
-- Keep the whole message under 3800 characters. If trimming is needed, drop lowest-tier items first, never the count summary.`,
+- List every relevant posting given, in full — do not drop or truncate items to save space. The
+  message will be automatically split into multiple Telegram messages if it's long; there is no
+  length limit you need to enforce yourself.`,
       },
       { role: "user", content: listText },
     ],
     temperature: 0.3,
-    max_tokens: 1200,
+    max_tokens: 4000,
   };
 
   const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
@@ -193,7 +196,13 @@ Output plain text (no markdown headers) formatted for a Telegram message:
     throw new Error(`NIM request failed: ${res.status} ${await res.text()}`);
   }
   const data = await res.json();
-  return data.choices?.[0]?.message?.content?.trim() || "(no summary generated)";
+  const choice = data.choices?.[0];
+  if (choice?.finish_reason === "length") {
+    console.error(
+      "WARNING: NIM response was truncated (finish_reason=length) — some postings/links may be missing from this alert. Consider raising max_tokens further."
+    );
+  }
+  return choice?.message?.content?.trim() || "(no summary generated)";
 }
 
 async function sendTelegram(text) {
