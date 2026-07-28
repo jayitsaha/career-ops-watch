@@ -13,23 +13,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check:
+  scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        leg: [curated, greenhouse, lever, ashby, workday, icims]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run scan leg (${{ matrix.leg }})
+        run: node scripts/scan-leg.mjs ${{ matrix.leg }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leg-${{ matrix.leg }}
+          path: leg-output/${{ matrix.leg }}
 
+  aggregate:
+    needs: scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Run career-ops scan and notify
+      - uses: actions/download-artifact@v4
+        with:
+          path: leg-output
+          pattern: "leg-*"
+
+      - name: Flatten downloaded artifact folders
+        run: |
+          cd leg-output
+          for d in leg-*/; do
+            name="${d#leg-}"
+            name="${name%/}"
+            if [ "$d" != "$name/" ]; then
+              mkdir -p "../leg-output-flat/$name"
+              cp -r "$d"* "../leg-output-flat/$name/" 2>/dev/null || true
+            fi
+          done
+          cd ..
+          rm -rf leg-output
+          mv leg-output-flat leg-output
+          ls -la leg-output
+
+      - name: Aggregate, summarize, and notify
         env:
-          NIM_API_KEY: ${{ secrets.NIM_API_KEY }}
+          NIM_API_KEYS: ${{ secrets.NIM_API_KEYS }}
           NIM_MODEL: ${{ vars.NIM_MODEL }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node scripts/run.mjs
+        run: node scripts/aggregate-and-notify.mjs
 
       - name: Commit updated state
         run: |
