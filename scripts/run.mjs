@@ -24,13 +24,24 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const USER_PROFILE = `Incoming Georgia Tech MS in Computer Science student, specializing in Machine
-Learning. Targeting: Data Science roles, Software Engineering roles, Applied
-Scientist / Research Scientist roles, and roles at quantitative trading firms
-(quant research, quant dev, quant trading). Prefers internships/new-grad roles
-that are ML/DS/SWE/quant relevant; not interested in unrelated fields (sales,
-non-technical, etc). These postings come from an automated ATS scan (career-ops),
-so some may be full-time-only roles rather than internships — flag that in
-your "Why" note when it looks like the case.`;
+Learning. Wants ONLY Summer 2027 internships, USA-based, in exactly these
+tracks: (1) Data Scientist / Applied Data Scientist / Research Data Scientist,
+(2) Software Engineer / SWE (including close variants: ML Engineer, Platform
+Engineer intern roles), (3) Quantitative Research (quant research intern/
+researcher — NOT quant trading, NOT quant trader, NOT quant analyst). Drop
+anything that isn't a Summer 2027 US internship in one of these three tracks —
+general Applied Scientist/Research Scientist (non-DS), GenAI/LLM/Agentic
+roles, quant trading/analyst roles, non-US postings, and full-time-only roles
+are all OUT OF SCOPE and should be omitted entirely, even if they were flagged
+as a raw match. These postings come from an automated ATS scan (career-ops).`;
+
+// Hard gate: most raw ATS postings carry no structured "year" field, so the
+// title/company text itself must mention 2027 (case-insensitive) or this
+// wrapper won't even send it to NIM for consideration.
+function mentionsTargetYear(offer) {
+  const text = `${offer.title} ${offer.company}`.toLowerCase();
+  return text.includes("2027");
+}
 
 const PIPELINE_SKELETON = `# Pipeline\n\n## Pending\n\n## Processed\n`;
 
@@ -198,10 +209,13 @@ async function main() {
   const scanResults = runScans();
   console.log("Scan results:", scanResults);
 
-  const offers = parsePendingOffers();
-  console.log(`New postings found: ${offers.length}`);
+  const allOffers = parsePendingOffers();
+  console.log(`New postings found (pre year-filter): ${allOffers.length}`);
 
   persistState();
+
+  const offers = allOffers.filter(mentionsTargetYear);
+  console.log(`New postings mentioning 2027: ${offers.length}`);
 
   if (offers.length === 0) {
     console.log("No changes — nothing to notify.");

@@ -4,6 +4,14 @@ Hourly GitHub Actions watcher built on top of
 [santifer/career-ops](https://github.com/santifer/career-ops)'s zero-token
 (no-LLM) portal scanners.
 
+**Scope (narrowed 2026-07-29):** Summer 2027 internships, USA-based only, in
+exactly three tracks — Data Scientist/Applied DS/Research Data Scientist,
+Software Engineer/SWE (+ ML Engineer/Platform Engineer variants), and
+Quantitative Research (not quant trading). Enforced two ways: `config/
+portals.yml`'s `title_filter` (upstream, in career-ops itself) and a hard
+"must mention 2027" text gate in `scripts/run.mjs` (`mentionsTargetYear`),
+since most raw ATS postings carry no structured year field.
+
 Every hour (`.github/workflows/career-ops-watch.yml`, offset 15 min past the
 hour so it doesn't collide with `job-alert-bot`), it:
 
